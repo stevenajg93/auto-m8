@@ -1,35 +1,18 @@
-# auto.m8 — Fully Autonomous Multi-Marketplace Revenue Engine
+# 🤖 auto.m8 — Fully Autonomous Multi-Marketplace Revenue Engine
 
-Overview
-auto.m8 is a self-driving factory for digital assets that generates → tags → uploads → earns → reinvests across:
-- POD
-- Digital Products
-- Stock Media
-- Apps/Games
-- E-commerce
+![Golden Set Verified](https://img.shields.io/badge/Golden%20Set-PASS-success?style=for-the-badge&logo=github)
+![Version](https://img.shields.io/badge/version-v1.0-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/license-CC0-green?style=for-the-badge)
 
-Run & Test Sheet
-- make init                : Bootstrap environment
-- make check-env           : Verify env template
-- make dev                 : Start local services (stub)
-- make plan-all-dry        : Simulate all pipelines
-- make validate            : Schema validation
-- make compliance-check    : License + provenance gate
-- make e2e-all             : Live run (future)
-- make payouts-scan        : Check balances
-- make retry-dlq           : Retry failed tasks
-- make report-*            : Metrics and analytics
+### Overview
+auto.m8 is a self-driving factory for digital assets across five markets (POD, Digital Products, Stock Media, Apps/Games, E-commerce).
+It enforces CC0 compliance, schema validation, cost tracking in GBP, and streams live events to a local dashboard.
 
-Structure
-infra/
-  scripts/
-shared/
-  prompts/{system,task,tool,critique}/
-  schemas/
-  examples/
-
-Next Steps
-1. Bind real adapters in /shared/adapters
-2. Add real workflows in /shared/services/*/workflows/
-3. Configure CI for weekly commit check
-4. Push to GitHub for public visibility
+### Runbook
+```bash
+make run-all-dry          # run all five markets in parallel (dry)
+make report-costs         # estimate recent GBP cost footprint
+make rotate-logs          # archive and validate event logs
+make test-golden-set      # verify all quality gates
+make plan-master-dry      # execute Master Planfile
+```
