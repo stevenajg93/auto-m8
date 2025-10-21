@@ -90,3 +90,7 @@ run-all-dry:
 	@echo "🧪 Running all workflows in parallel (dry)…"
 	python3 infra/runtime/pipeline_runner.py --all --dry
 	@echo "✅ Parallel dry-run complete."
+
+rotate-logs:
+	@echo "♻️  Rotating and validating event logs..."
+	python3 infra/events/rotate_and_validate.py

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AutoM8Event.v1",
+  "type": "object",
+  "properties": {
+    "ts": { "type": "string", "format": "date-time" },
+    "event": { "type": "string" },
+    "detail": { "type": "object" }
+  },
+  "required": ["ts", "event", "detail"]
+}
