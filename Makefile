@@ -94,3 +94,7 @@ run-all-dry:
 rotate-logs:
 	@echo "♻️  Rotating and validating event logs..."
 	python3 infra/events/rotate_and_validate.py
+
+report-costs:
+	@echo "💳 Estimating costs from recent events..."
+	python3 infra/costs/estimate_from_events.py

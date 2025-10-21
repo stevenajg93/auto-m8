@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "currency": "USD",
+  "rates": {
+    "llm.token": 0.000002,
+    "sd.image": 0.002,
+    "musicgen.second": 0.0005,
+    "upload.api.call": 0.0002,
+    "browser.automation.minute": 0.01
+  },
+  "event_map": {
+    "generation.completed:image": { "key": "sd.image", "multiplier_field": "count", "default_count": 1 },
+    "generation.completed:text":  { "key": "llm.token", "multiplier_field": "tokens", "default_count": 2000 },
+    "upload.completed":           { "key": "upload.api.call", "multiplier_field": "count", "default_count": 1 },
+    "upload.skipped.dryrun":      { "key": null },
+    "compliance.checked":         { "key": "upload.api.call", "default_count": 1 },
+    "step.noop":                  { "key": null }
+  }
+}
