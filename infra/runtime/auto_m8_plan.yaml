@@ -1,0 +1,41 @@
+# ⚙️ auto.m8 — Master Planfile v1.0
+version: "1.0.0"
+description: "Unified orchestration plan controlling all five revenue markets with shared policies, golden tests, and cost gates."
+markets:
+  - name: POD
+    workflow: shared/services/pod/workflows/pod_v1.yaml
+    policy_ref: shared/policies/costs_v1.json
+  - name: DIGITAL_PRODUCTS
+    workflow: shared/services/digital/workflows/digital_v1.yaml
+    policy_ref: shared/policies/costs_v1.json
+  - name: STOCK_MEDIA
+    workflow: shared/services/stock/workflows/stock_v1.yaml
+    policy_ref: shared/policies/costs_v1.json
+  - name: APPS_GAMES
+    workflow: shared/services/apps/workflows/apps_v1.yaml
+    policy_ref: shared/policies/costs_v1.json
+  - name: ECOM
+    workflow: shared/services/ecom/workflows/ecom_v1.yaml
+    policy_ref: shared/policies/costs_v1.json
+
+rules:
+  token_limit_per_job: 10000
+  max_parallel_jobs: 5
+  min_commits_per_week: 2
+  currency: "GBP"
+
+golden_set:
+  - id: CC0_Verification
+    condition: "all assets have license_proof and provenance_ref"
+  - id: RateLimit_Obedience
+    condition: "no platform exceeds max_req_per_min"
+  - id: Schema_Validation
+    condition: "all outputs validate against job.v1 schema"
+  - id: Compliance_Zero_Flag
+    condition: "0 flagged assets after compliance-check"
+  - id: Resumability
+    condition: "rerun resumes cleanly without duplicates"
+  - id: Parallelism_Stable
+    condition: "no deadlocks across 5 concurrent pipelines"
+  - id: Payouts_Emit
+    condition: "payout events emitted for every platform"

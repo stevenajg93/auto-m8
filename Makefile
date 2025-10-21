@@ -112,3 +112,8 @@ run-ecom-dry:
 	@echo "🧪 Running E-commerce workflow (dry-run)…"
 	python3 infra/runtime/pipeline_runner.py --workflow shared/services/ecom/workflows/ecom_v1.yaml --dry
 	@echo "✅ E-commerce dry-run finished."
+
+plan-master-dry:
+	@echo "🧠 Running Master Planfile (all markets)..."
+	python3 infra/runtime/pipeline_runner.py --all --dry
+	@echo "✅ Master Planfile run complete (dry)."
