@@ -1,6 +1,6 @@
-# ========== auto.m8 — Makefile (Full v1.0 with Events) ==========
+# ========== auto.m8 — Makefile (Runtime v1.1) ==========
 SHELL := /bin/bash
-.PHONY: init check-env dev plan-all-dry validate compliance-check e2e-all tail-logs emit-test payouts-scan retry-dlq ci-activity-check report-accuracy report-compliance report-tokens report-throughput report-pnl
+.PHONY: init check-env dev plan-all-dry validate compliance-check e2e-all tail-logs emit-test payouts-scan retry-dlq ci-activity-check report-accuracy report-compliance report-tokens report-throughput report-pnl run-pod-dry
 
 init:
 	@echo "🚀 Initialising auto.m8 environment..."
@@ -53,7 +53,7 @@ retry-dlq:
 
 ci-activity-check:
 	@echo "🧩 Checking weekly commit activity..."
-	@echo "✅ CI check placeholder."
+	@python3 infra/scripts/ci_activity_check.py || true
 
 report-accuracy:
 	@echo "📊 Reporting automation accuracy..."
@@ -74,4 +74,9 @@ report-throughput:
 report-pnl:
 	@echo "💵 Reporting profitability (PnL)..."
 	@echo "✅ PnL report placeholder."
+
+run-pod-dry:
+	@echo "🧪 Running POD workflow (dry-run)…"
+	python3 infra/runtime/pipeline_runner.py --workflow shared/services/pod/workflows/pod_v1.yaml --dry
+	@echo "✅ POD dry-run finished."
 # ==================================================
