@@ -85,3 +85,8 @@ run-digital-dry:
 	@echo "🧪 Running Digital Products workflow (dry-run)…"
 	python3 infra/runtime/pipeline_runner.py --workflow shared/services/digital/workflows/digital_v1.yaml --dry
 	@echo "✅ Digital Products dry-run finished."
+
+run-all-dry:
+	@echo "🧪 Running all workflows in parallel (dry)…"
+	python3 infra/runtime/pipeline_runner.py --all --dry
+	@echo "✅ Parallel dry-run complete."
