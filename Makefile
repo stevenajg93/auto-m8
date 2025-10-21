@@ -117,3 +117,7 @@ plan-master-dry:
 	@echo "🧠 Running Master Planfile (all markets)..."
 	python3 infra/runtime/pipeline_runner.py --all --dry
 	@echo "✅ Master Planfile run complete (dry)."
+
+test-golden-set:
+	@echo "🧪 Running Golden Set verification suite..."
+	python3 infra/tests/golden_set_verify.py
