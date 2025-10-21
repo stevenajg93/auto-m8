@@ -98,3 +98,7 @@ rotate-logs:
 report-costs:
 	@echo "💳 Estimating costs from recent events..."
 	python3 infra/costs/estimate_from_events.py
+
+report-costs:
+	@echo "💳 Estimating costs from recent events..."
+	python3 infra/costs/estimate_from_events.py
