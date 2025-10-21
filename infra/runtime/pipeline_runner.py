@@ -1,94 +1,78 @@
 #!/usr/bin/env python3
 """
 auto-m8 — Pipeline Runner (parallel multi-market orchestrator)
-Executes multiple YAML workflows concurrently with dry-run safety.
+Guarantees workflow.finished emission for observability completeness.
 """
-import argparse, concurrent.futures, json, os, subprocess, sys, time
+import argparse, concurrent.futures, json, subprocess, sys, time
 from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 EVENTS = ROOT / "infra" / "events" / "events_log.py"
-
 ADAPTER_MAP = {
     "Redbubble": "shared.adapters.redbubble",
     "Gumroad": "shared.adapters.gumroad",
     "Shutterstock": "shared.adapters.shutterstock",
     "GooglePlay": "shared.adapters.google_play",
-    "Amazon": "shared.adapters.amazon",
+    "Amazon": "shared.adapters.amazon"
 }
 
-def emit(event_type: str, detail: dict):
-    subprocess.run([sys.executable, str(EVENTS), event_type, json.dumps(detail)], check=True)
+def emit(event, detail):
+    subprocess.run([sys.executable, str(EVENTS), event, json.dumps(detail)], check=True)
 
-def dotted_import(name: str):
+def dotted_import(name):
     __import__(name)
     return sys.modules[name]
 
 def route_tool(step):
-    tool = step.get("tool", "")
-    args = step.get("args", {}) or {}
-    if tool == "uploader.api.platform":
-        platform = args.get("platform")
-        modname = ADAPTER_MAP.get(platform)
-        if not modname:
-            raise ValueError(f"No adapter mapped for {platform}")
-        return dotted_import(modname)
+    if step.get("tool") == "uploader.api.platform":
+        p = step["args"].get("platform")
+        m = ADAPTER_MAP.get(p)
+        if m: return dotted_import(m)
     return None
 
 def run_step(step, dry):
-    name = step.get("name"); tool = step.get("tool"); args = step.get("args", {}) or {}
-    emit("step.started", {"name": name, "tool": tool})
+    name, tool, args = step.get("name"), step.get("tool"), step.get("args",{})
+    emit("step.started", {"name":name,"tool":tool})
     time.sleep(0.05)
-    if tool == "generator.image.sd":
-        emit("generation.completed", {"count": args.get("n",1)})
-    elif tool == "generator.text.llm":
-        emit("generation.completed", {"count": args.get("n",1)})
-    elif tool == "metadata.tagger":
-        emit("tagging.completed", {"taxonomy": args.get("taxonomy","")})
-    elif tool == "uploader.api.platform":
-        adapter = route_tool(step)
+    if tool.startswith("generator."):
+        emit("generation.completed", {"args":args})
+    elif tool=="metadata.tagger":
+        emit("tagging.completed", {"args":args})
+    elif tool=="uploader.api.platform":
+        adapter=route_tool(step)
         if dry:
-            emit("upload.skipped.dryrun", {"platform": adapter.__name__})
+            emit("upload.skipped.dryrun", {"platform":adapter.__name__ if adapter else "unknown"})
         else:
-            res = adapter.upload({}, {}, "env:TOKEN")
-            emit("upload.completed", {"platform": adapter.__name__, "result": res})
-    elif tool == "compliance.cc0.verify":
-        emit("compliance.checked", {"license": args.get("license_url","")})
-    else:
-        emit("step.noop", {"tool": tool})
-    emit("step.finished", {"name": name, "tool": tool})
+            res=adapter.upload({}, {}, "env:TOKEN") if adapter else {"status":"no-adapter"}
+            emit("upload.completed", {"platform":adapter.__name__ if adapter else "unknown","result":res})
+    elif tool=="compliance.cc0.verify":
+        emit("compliance.checked", {"args":args})
+    emit("step.finished", {"name":name,"tool":tool})
 
-def run_workflow(wf_path: Path, dry=True):
-    wf = yaml.safe_load(open(wf_path))
-    market = wf.get("market", wf_path.stem)
-    emit("workflow.started", {"market": market, "dry": dry})
-    for step in wf.get("steps", []):
-        run_step(step, dry=dry)
-    emit("workflow.finished", {"market": market, "dry": dry})
+def run_workflow(path,dry=True):
+    wf=yaml.safe_load(open(path))
+    market=wf.get("market",path.stem)
+    emit("workflow.started", {"market":market,"dry":dry})
+    try:
+        for s in wf.get("steps",[]): run_step(s,dry)
+    finally:
+        emit("workflow.finished", {"market":market,"dry":dry})
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--all", action="store_true", help="Run all workflows under shared/services")
-    ap.add_argument("--workflow", help="Path to a single workflow YAML")
-    ap.add_argument("--dry", action="store_true", help="Dry-run mode")
-    args = ap.parse_args()
-
-    paths = []
-    if args.all:
-        for wf in Path(ROOT/"shared/services").rglob("*.yaml"):
-            paths.append(wf)
-    elif args.workflow:
-        paths = [Path(args.workflow)]
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--all",action="store_true")
+    ap.add_argument("--workflow")
+    ap.add_argument("--dry",action="store_true")
+    a=ap.parse_args()
+    files=[]
+    if a.all:
+        for wf in (ROOT/"shared/services").rglob("*.yaml"): files.append(wf)
+    elif a.workflow: files=[Path(a.workflow)]
     else:
-        print("Use --all or --workflow <path>", file=sys.stderr)
-        sys.exit(1)
-
-    emit("orchestrator.started", {"count": len(paths)})
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(paths),5)) as ex:
-        futures = [ex.submit(run_workflow, wf, args.dry) for wf in paths]
+        print("Use --all or --workflow <path>",file=sys.stderr); sys.exit(1)
+    emit("orchestrator.started", {"count":len(files)})
+    with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(files),5)) as ex:
+        futures=[ex.submit(run_workflow,f,a.dry) for f in files]
         concurrent.futures.wait(futures)
-    emit("orchestrator.finished", {"count": len(paths)})
-
-if __name__ == "__main__":
-    main()
+    emit("orchestrator.finished", {"count":len(files)})
