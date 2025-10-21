@@ -1,0 +1,30 @@
+# 🛒 auto.m8 — E-commerce Workflow v1.0
+version: "1.0.0"
+market: "ECOM"
+description: "Upload CC0 household SKU bundles to Amazon Marketplace (dry-run safe)"
+steps:
+  - name: package
+    tool: generator.image.sd
+    args:
+      prompt: "Generate product hero images for eco-friendly household goods"
+      n: 4
+  - name: tag
+    tool: metadata.tagger
+    args:
+      taxonomy: "ecom_default"
+      max_tags: 10
+  - name: upload
+    tool: uploader.api.platform
+    args:
+      platform: "Amazon"
+      auth_ref: "env:AMAZON_TOKEN"
+    fallback:
+      tool: uploader.browser.playwright.platform
+      proxy_pool: "auto"
+  - name: verify
+    tool: compliance.cc0.verify
+    args:
+      license_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+      provenance_ref: "ipfs://bundle/QmAutoM8Ecom0001"
+rate_limit:
+  max_req_per_min: 5

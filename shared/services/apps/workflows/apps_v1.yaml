@@ -1,0 +1,25 @@
+# 🎮 auto.m8 — Apps/Games Workflow v1.0
+version: "1.0.0"
+market: "APPS_GAMES"
+description: "Package and upload open-source reskinned apps to Google Play (dry-run safe)"
+steps:
+  - name: prepare
+    tool: generator.text.llm
+    args:
+      prompt: "Generate store listing for minimalist Android puzzle games"
+      n: 2
+  - name: upload
+    tool: uploader.api.platform
+    args:
+      platform: "GooglePlay"
+      auth_ref: "env:GOOGLE_PLAY_TOKEN"
+    fallback:
+      tool: uploader.browser.playwright.platform
+      proxy_pool: "auto"
+  - name: verify
+    tool: compliance.cc0.verify
+    args:
+      license_url: "https://opensource.org/licenses/MIT"
+      provenance_ref: "ipfs://bundle/QmAutoM8App0001"
+rate_limit:
+  max_req_per_min: 6

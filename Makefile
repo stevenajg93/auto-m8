@@ -102,3 +102,13 @@ report-costs:
 report-costs:
 	@echo "💳 Estimating costs from recent events..."
 	python3 infra/costs/estimate_from_events.py
+
+run-apps-dry:
+	@echo "🧪 Running Apps/Games workflow (dry-run)…"
+	python3 infra/runtime/pipeline_runner.py --workflow shared/services/apps/workflows/apps_v1.yaml --dry
+	@echo "✅ Apps/Games dry-run finished."
+
+run-ecom-dry:
+	@echo "🧪 Running E-commerce workflow (dry-run)…"
+	python3 infra/runtime/pipeline_runner.py --workflow shared/services/ecom/workflows/ecom_v1.yaml --dry
+	@echo "✅ E-commerce dry-run finished."

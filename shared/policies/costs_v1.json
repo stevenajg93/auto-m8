@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "currency": "USD",
+  "currency": "GBP",
   "rates": {
-    "llm.token": 0.000002,
-    "sd.image": 0.002,
-    "musicgen.second": 0.0005,
-    "upload.api.call": 0.0002,
-    "browser.automation.minute": 0.01
+    "llm.token": 0.0000016,
+    "sd.image": 0.0016,
+    "musicgen.second": 0.0004,
+    "upload.api.call": 0.00016,
+    "browser.automation.minute": 0.008
   },
   "event_map": {
     "generation.completed:image": { "key": "sd.image", "multiplier_field": "count", "default_count": 1 },
