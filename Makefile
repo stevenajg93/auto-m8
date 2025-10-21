@@ -80,3 +80,8 @@ run-pod-dry:
 	python3 infra/runtime/pipeline_runner.py --workflow shared/services/pod/workflows/pod_v1.yaml --dry
 	@echo "✅ POD dry-run finished."
 # ==================================================
+
+run-digital-dry:
+	@echo "🧪 Running Digital Products workflow (dry-run)…"
+	python3 infra/runtime/pipeline_runner.py --workflow shared/services/digital/workflows/digital_v1.yaml --dry
+	@echo "✅ Digital Products dry-run finished."

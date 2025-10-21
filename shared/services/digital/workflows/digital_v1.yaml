@@ -1,0 +1,25 @@
+# 🧩 auto.m8 — Digital Products Workflow v1.0
+version: "1.0.0"
+market: "DIGITAL_PRODUCTS"
+description: "Bundle and upload CC0 digital assets to Gumroad"
+steps:
+  - name: package
+    tool: generator.text.llm
+    args:
+      prompt: "Generate product descriptions for minimalist digital prints"
+      n: 3
+  - name: upload
+    tool: uploader.api.platform
+    args:
+      platform: "Gumroad"
+      auth_ref: "env:GUMROAD_TOKEN"
+    fallback:
+      tool: uploader.browser.playwright.platform
+      proxy_pool: "auto"
+  - name: verify
+    tool: compliance.cc0.verify
+    args:
+      license_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+      provenance_ref: "ipfs://bundle/QmAutoM8Digital0001"
+rate_limit:
+  max_req_per_min: 8
