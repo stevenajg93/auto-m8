@@ -1,0 +1,13 @@
+{
+  "policy_name": "ab_titles_tags_v1",
+  "enabled": true,
+  "buckets": [
+    { "name": "A", "vars": { "title_suffix": "" } },
+    { "name": "B", "vars": { "title_suffix": " | Minimalist" } }
+  ],
+  "bounds": {
+    "max_variants": 2,
+    "rotation_days": 7,
+    "selection_strategy": "balanced"
+  }
+}

@@ -1,0 +1,32 @@
+# 🧩 auto.m8 — POD Workflow v1.0
+version: "1.0.0"
+market: "POD"
+description: "Generate, tag, and upload CC0 artwork to Redbubble"
+steps:
+  - name: generate
+    tool: generator.image.sd
+    args:
+      prompt: "minimalist geometric abstract pattern"
+      n: 5
+      size: "1024x1024"
+      seed: 42
+  - name: tag
+    tool: metadata.tagger
+    args:
+      taxonomy: "market_default"
+      max_tags: 15
+  - name: upload
+    tool: uploader.api.platform
+    args:
+      platform: "Redbubble"
+      auth_ref: "env:REDBUBBLE_TOKEN"
+    fallback:
+      tool: uploader.browser.playwright.platform
+      proxy_pool: "auto"
+  - name: verify
+    tool: compliance.cc0.verify
+    args:
+      license_url: "https://creativecommons.org/publicdomain/zero/1.0/"
+      provenance_ref: "ipfs://bundle/QmAutoM8Pod0001"
+rate_limit:
+  max_req_per_min: 10
