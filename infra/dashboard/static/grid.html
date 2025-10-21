@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>auto.m8 Control Center</title>
+  <style>
+    body { font-family: 'Inter', sans-serif; background:#0a0a0a; color:#f0f0f0; margin:0; padding:20px; }
+    h1 { text-align:center; margin-bottom:30px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:20px; justify-items:center; }
+    .tile {
+      background:#111; border:2px solid #333; border-radius:14px; width:220px; height:180px;
+      display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:16px; transition:.3s;
+    }
+    .tile.running  { border-color:#00bcd4; box-shadow:0 0 12px #00bcd4; }
+    .tile.finished { border-color:#00c853; box-shadow:0 0 12px #00c853; }
+    .tile.error    { border-color:#ff1744; box-shadow:0 0 12px #ff1744; }
+    .tile h2 { margin:10px 0 0; font-size:1.1rem; }
+    .buttons { display:flex; gap:8px; }
+    button { background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:.8rem; }
+    button:hover { background:#333; }
+  </style>
+</head>
+<body>
+  <h1>auto.m8 Control Center</h1>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const markets = ["POD","DIGITAL_PRODUCTS","STOCK_MEDIA","APPS_GAMES","E_COMMERCE"];
+    const grid = document.getElementById("grid");
+
+    markets.forEach(market => {
+      const div = document.createElement("div");
+      div.className = "tile";
+      div.id = market;
+      div.innerHTML = `
+        <h2>${market.replace("_"," ")}</h2>
+        <div class="buttons">
+          <button class="run">Run</button>
+          <button class="dry">Dry</button>
+          <button class="stop">Stop</button>
+        </div>
+        <p class="status">Idle</p>
+      `;
+      div.querySelector(".run").onclick = () => trigger(market, "run");
+      div.querySelector(".dry").onclick = () => trigger(market, "run-dry");
+      div.querySelector(".stop").onclick = () => trigger(market, "stop");
+      grid.appendChild(div);
+    });
+
+    async function trigger(market, action) {
+      const tile = document.getElementById(market);
+      tile.className = "tile running";
+      tile.querySelector(".status").textContent = "Running...";
+      try {
+        const res = await fetch(`/` + action + `/` + market, { method: "POST" });
+        const data = await res.json();
+        tile.className = "tile finished";
+        tile.querySelector(".status").textContent = data.status || "Finished";
+      } catch (err) {
+        tile.className = "tile error";
+        tile.querySelector(".status").textContent = "Error";
+      }
+    }
+
+    // SSE live updates
+    const es = new EventSource("/stream");
+    es.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        const market = ev.detail && ev.detail.market;
+        if (!market) return;
+        const tile = document.getElementById(market);
+        if (!tile) return;
+        if (ev.event.includes("started")) {
+          tile.className = "tile running";
+          tile.querySelector(".status").textContent = "Running...";
+        } else if (ev.event.includes("finished")) {
+          tile.className = "tile finished";
+          tile.querySelector(".status").textContent = "Finished";
+        } else if (ev.event.includes("error")) {
+          tile.className = "tile error";
+          tile.querySelector(".status").textContent = "Error";
+        }
+      } catch {}
+    };
+  </script>
+</body>
+</html>
+

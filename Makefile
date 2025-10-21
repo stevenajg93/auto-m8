@@ -121,3 +121,44 @@ plan-master-dry:
 test-golden-set:
 	@echo "🧪 Running Golden Set verification suite..."
 	python3 infra/tests/golden_set_verify.py
+
+
+run-pod:
+	@echo "🚀 POD workflow starting..."
+	python3 infra/events/events_log.py "workflow.started" '{"market":"POD"}'
+	sleep 1
+	python3 infra/events/events_log.py "generation.completed" '{"market":"POD","count":5}'
+	sleep 1
+	python3 infra/events/events_log.py "workflow.finished" '{"market":"POD"}'
+
+run-digital:
+	@echo "🚀 Digital Products workflow starting..."
+	python3 infra/events/events_log.py "workflow.started" '{"market":"DIGITAL_PRODUCTS"}'
+	sleep 1
+	python3 infra/events/events_log.py "generation.completed" '{"market":"DIGITAL_PRODUCTS","count":3}'
+	sleep 1
+	python3 infra/events/events_log.py "workflow.finished" '{"market":"DIGITAL_PRODUCTS"}'
+
+run-stock:
+	@echo "🚀 Stock Media workflow starting..."
+	python3 infra/events/events_log.py "workflow.started" '{"market":"STOCK_MEDIA"}'
+	sleep 1
+	python3 infra/events/events_log.py "generation.completed" '{"market":"STOCK_MEDIA","count":4}'
+	sleep 1
+	python3 infra/events/events_log.py "workflow.finished" '{"market":"STOCK_MEDIA"}'
+
+run-apps:
+	@echo "🚀 Apps & Games workflow starting..."
+	python3 infra/events/events_log.py "workflow.started" '{"market":"APPS_GAMES"}'
+	sleep 1
+	python3 infra/events/events_log.py "generation.completed" '{"market":"APPS_GAMES","count":2}'
+	sleep 1
+	python3 infra/events/events_log.py "workflow.finished" '{"market":"APPS_GAMES"}'
+
+run-ecom:
+	@echo "🚀 E-Commerce workflow starting..."
+	python3 infra/events/events_log.py "workflow.started" '{"market":"E_COMMERCE"}'
+	sleep 1
+	python3 infra/events/events_log.py "generation.completed" '{"market":"E_COMMERCE","count":6}'
+	sleep 1
+	python3 infra/events/events_log.py "workflow.finished" '{"market":"E_COMMERCE"}'

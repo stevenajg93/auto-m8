@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>auto.m8 — Earnings Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background:#000; color:#0ff; font-family:monospace; margin:0; padding:20px; }
+    h1 { text-align:center; color:#0ff; }
+    canvas { background:#001; border-radius:12px; margin:20px auto; display:block; max-width:90%; }
+    a { color:#0ff; text-decoration:none; position:fixed; top:10px; left:10px; }
+  </style>
+</head>
+<body>
+  <a href="/static/grid.html">← Back</a>
+  <h1>📊 Earnings Dashboard</h1>
+  <canvas id="barChart" height="120"></canvas>
+  <canvas id="lineChart" height="120"></canvas>
+  <script>
+    async function loadData(){
+      const res = await fetch('/api/metrics');
+      const data = await res.json();
+      const markets = Object.keys(data.by_market);
+      const profits = Object.values(data.by_market);
+      new Chart(document.getElementById('barChart'), {
+        type:'bar',
+        data:{ labels:markets, datasets:[{ label:'£ Profit per Market', data:profits, backgroundColor:'#0ff80f'}]},
+        options:{ scales:{ y:{ beginAtZero:true }}}
+      });
+      const days = data.daily.map(d=>d.date);
+      const vals = data.daily.map(d=>d.total);
+      new Chart(document.getElementById('lineChart'), {
+        type:'line',
+        data:{ labels:days, datasets:[{ label:'Daily Profit (£)', data:vals, borderColor:'#0ff', tension:0.2}]},
+        options:{ scales:{ y:{ beginAtZero:true }}}
+      });
+    }
+    loadData();
+  </script>
+</body>
+</html>

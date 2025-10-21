@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>auto.m8 — Cinematic Dashboard</title>
+  <style>
+    body {
+      margin: 0; background: radial-gradient(circle at 50% 20%, #0f0f0f, #000);
+      color: #00ffcc; font-family: "Courier New", monospace;
+      overflow: hidden;
+    }
+    h1 { text-align: center; margin-top: 1rem; color: #00ffe0; }
+    #log {
+      width: 90%; height: 80vh; margin: 1rem auto; padding: 1rem;
+      background: rgba(0,0,0,0.6); border: 1px solid #00ffcc; border-radius: 12px;
+      overflow-y: auto; box-shadow: 0 0 20px #00ffcc50 inset;
+      font-size: 0.95rem; line-height: 1.3rem;
+    }
+    .line { opacity: 0; animation: fadeIn 0.5s forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .event { color: #0ff; }
+    .warn { color: #ffb300; }
+    .err { color: #ff5050; }
+    .ok { color: #00ff7f; }
+  </style>
+</head>
+<body>
+  <h1>auto.m8 — Cinematic Live Feed</h1>
+  <div id="log"></div>
+
+  <script>
+    const log = document.getElementById("log");
+    const es = new EventSource("/stream");
+    es.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      const div = document.createElement("div");
+      div.className = "line";
+      const event = data.event || "unknown";
+      let cls = "event";
+      if(event.includes("error")) cls="err";
+      else if(event.includes("finished")) cls="ok";
+      else if(event.includes("started")) cls="warn";
+      div.innerHTML = `[${new Date().toLocaleTimeString()}] <span class="${cls}">${event}</span> — ${JSON.stringify(data.detail||{})}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    };
+  </script>
+</body>
+</html>
