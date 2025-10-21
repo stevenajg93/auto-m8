@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AutoM8Job.v1",
+  "type": "object",
+  "properties": {
+    "run_id": { "type": "string" },
+    "context_digest": {
+      "type": "object",
+      "properties": {
+        "markets": { "type": "array", "items": { "type": "string" } },
+        "tokens_used": { "type": "integer" },
+        "compression": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["markets", "tokens_used", "compression"]
+    },
+    "plan": { "type": "object" },
+    "ab_testing": { "type": "object" },
+    "ops": { "type": "object" },
+    "observability": { "type": "object" },
+    "critique": { "type": "object" },
+    "version": { "type": "string" }
+  },
+  "required": ["run_id", "context_digest", "plan", "version"]
+}

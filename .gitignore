@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node/General
+node_modules/
+dist/
+build/
+.tmp/
+.DS_Store
+
+# Project
+logs/
+tmp/
+.env
+.env.*
+infra/.env.local

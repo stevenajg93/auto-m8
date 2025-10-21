@@ -1,0 +1,41 @@
+{
+  "run_id": "uuid-1234",
+  "context_digest": {
+    "markets": ["POD"],
+    "tokens_used": 9600,
+    "compression": ["GZIP", "TLDR", "SCHEMA_ONLY"]
+  },
+  "plan": {
+    "pipelines": [
+      {
+        "market": "POD",
+        "pipeline_rev": "1.0.0",
+        "steps": [
+          {
+            "name": "generate",
+            "tool": "generator.image.sd",
+            "args": { "prompt": "geometric minimalist art" },
+            "compliance": {
+              "license": "CC0",
+              "license_proof": "https://creativecommons.org/publicdomain/zero/1.0/",
+              "provenance_bundle": "ipfs://bundle/QmAutoM8Pod0001",
+              "blocked": false
+            }
+          },
+          {
+            "name": "upload",
+            "tool": "uploader.api.platform",
+            "args": { "platform": "Redbubble" },
+            "compliance": {
+              "license": "CC0",
+              "license_proof": "https://creativecommons.org/publicdomain/zero/1.0/",
+              "provenance_bundle": "ipfs://bundle/QmAutoM8Pod0001",
+              "blocked": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "version": "auto.m8/job.v1"
+}
