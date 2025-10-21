@@ -1,0 +1,29 @@
+name: auto-m8 CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate-and-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip jsonschema
+      - name: Schema validate
+        run: |
+          python infra/scripts/validate_schema.py shared/examples/example_run_pod.json
+      - name: Compliance check
+        run: |
+          python infra/scripts/compliance_check.py shared/examples/example_run_pod.json
+      - name: CI activity check (weekly ≥2 commits)
+        run: |
+          python infra/scripts/ci_activity_check.py

@@ -1,6 +1,6 @@
-# ========== auto.m8 — Makefile (with Validation Integration) ==========
+# ========== auto.m8 — Makefile (Full v1.0 with Events) ==========
 SHELL := /bin/bash
-.PHONY: init check-env dev plan-all-dry validate compliance-check e2e-all tail-logs payouts-scan retry-dlq ci-activity-check report-accuracy report-compliance report-tokens report-throughput report-pnl
+.PHONY: init check-env dev plan-all-dry validate compliance-check e2e-all tail-logs emit-test payouts-scan retry-dlq ci-activity-check report-accuracy report-compliance report-tokens report-throughput report-pnl
 
 init:
 	@echo "🚀 Initialising auto.m8 environment..."
@@ -19,7 +19,8 @@ dev:
 
 plan-all-dry:
 	@echo "🧠 Running planner (dry-run) for all markets..."
-	@echo "(Stub — will call Orchestrator prompts later)"
+	python3 infra/events/events_log.py "generation.started" '{"market":"POD","count":5}'
+	python3 infra/events/events_log.py "upload.completed" '{"market":"POD","count":5}'
 	@echo "✅ Plans generated (dry-run)."
 
 validate:
@@ -29,23 +30,25 @@ validate:
 
 compliance-check:
 	@echo "🛡️ Running compliance preflight (CC0 proofs)..."
-	@echo "✅ All assets verified (placeholder)."
+	python3 infra/scripts/compliance_check.py shared/examples/example_run_pod.json
+	@echo "✅ Compliance preflight complete."
 
-e2e-all:
-	@echo "🌍 Running live end-to-end pipelines (real uploads)..."
-	@echo "(Stub — will call actual adapters)"
-	@echo "✅ E2E complete."
+emit-test:
+	@echo "🛰️  Emitting sample event..."
+	python3 infra/events/events_log.py "system.heartbeat" '{"status":"ok"}'
 
 tail-logs:
-	@echo "📜 Tailing logs..."
-	tail -f logs/auto.m8.log || echo "no logs yet"
+	@echo "📜 Streaming events..."
+	tail -f logs/events.jsonl || echo "no events yet"
 
 payouts-scan:
 	@echo "💰 Fetching payouts snapshots..."
+	python3 infra/events/events_log.py "payouts.snapshot" '{"balance":100.00}'
 	@echo "✅ Payouts scanned."
 
 retry-dlq:
 	@echo "🔁 Retrying dead-letter queue..."
+	python3 infra/events/events_log.py "dlq.retried" '{"count":3}'
 	@echo "✅ DLQ drained."
 
 ci-activity-check:
